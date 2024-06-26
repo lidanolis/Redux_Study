@@ -4,23 +4,32 @@ import { RootState } from "../reduxComponent/store";
 import { useState } from "react";
 
 //actions
-import {
-  ADD_NEW_FRUIT,
-  DELETE_FRUIT,
-  MODIFY_FRUIT,
-} from "../reduxComponent/slice";
+import { DELETE_FRUIT, fruitProp } from "../reduxComponent/slice";
 import React from "react";
+import FruitModal from "../modals/fruitModals";
 
 export const MainPage: React.FC = () => {
   const dipatch = useDispatch();
   const fruits = useSelector((state: RootState) => state.fruit);
 
-  const [id, setId] = useState("");
-  const [name, setName] = useState("");
-  const [brand, setBrand] = useState("");
-  const [price, setPrice] = useState(0);
-  const [numberAvailable, setNumberAvailable] = useState(0);
+  const [fruitInfo, setFruitInfo] = useState<fruitProp>({
+    id: "",
+    name: "",
+    brand: "",
+    price: 0,
+    numberAvailable: 0,
+    numberSold: 0,
+  });
+
   const [dialogStatus, setDialogStatus] = useState("Add");
+  const [showModal, setShowModal] = useState(false);
+
+  function onInfoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setFruitInfo((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  }
 
   return (
     <>
@@ -40,12 +49,16 @@ export const MainPage: React.FC = () => {
             </button>
             <button
               onClick={() => {
-                setId(perFruit.id);
-                setName(perFruit.name);
-                setBrand(perFruit.brand);
-                setPrice(Number(perFruit.price));
-                setNumberAvailable(Number(perFruit.numberAvailable));
+                setFruitInfo({
+                  id: perFruit.id,
+                  name: perFruit.name,
+                  brand: perFruit.brand,
+                  price: Number(perFruit.price),
+                  numberAvailable: Number(perFruit.numberAvailable),
+                  numberSold: Number(perFruit.numberSold),
+                });
                 setDialogStatus("Modify");
+                setShowModal(true);
               }}
             >
               Modify Fruit
@@ -54,78 +67,18 @@ export const MainPage: React.FC = () => {
           <br />
         </React.Fragment>
       ))}
-      <br />
-      <br />
-      <label>name of Item:</label>
-      <input
-        type="text"
-        placeholder="name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <label>name of Brand:</label>
-      <input
-        type="text"
-        placeholder="brand"
-        value={brand}
-        onChange={(e) => setBrand(e.target.value)}
-      />
-      <label>price of Item:</label>
-      <input
-        type="text"
-        placeholder="price"
-        value={price}
-        onChange={(e) => setPrice(Number(e.target.value) || 0)}
-      />
-      <label>number of Item:</label>
-      <input
-        type="text"
-        placeholder="number available"
-        value={numberAvailable}
-        onChange={(e) => setNumberAvailable(Number(e.target.value) || 0)}
-      />
-      <button
-        onClick={() => {
-          dialogStatus === "Add"
-            ? dipatch(
-                ADD_NEW_FRUIT({
-                  name: name,
-                  brand: brand,
-                  price: price,
-                  numberSold: 0,
-                  numberAvailable: numberAvailable,
-                })
-              )
-            : dipatch(
-                MODIFY_FRUIT({
-                  id: id,
-                  name: name,
-                  brand: brand,
-                  price: price,
-                  numberAvailable: numberAvailable,
-                })
-              );
-          setDialogStatus("Add");
-          setName("");
-          setBrand("");
-          setNumberAvailable(0);
-          setPrice(0);
-        }}
-      >
-        {`${dialogStatus} New Item`}
-      </button>
-      {dialogStatus === "Modify" && (
-        <button
-          onClick={() => {
-            setDialogStatus("Add");
-            setName("");
-            setBrand("");
-            setNumberAvailable(0);
-            setPrice(0);
-          }}
-        >
-          Cancel
-        </button>
+
+      <button onClick={() => setShowModal(true)}>Add Fruit</button>
+      {showModal && (
+        <FruitModal
+          status={dialogStatus}
+          setStatus={setDialogStatus}
+          showModal={showModal}
+          setShowModal={setShowModal}
+          fruitInfo={fruitInfo}
+          setFruitInfo={setFruitInfo}
+          onInfoChange={onInfoChange}
+        />
       )}
     </>
   );
