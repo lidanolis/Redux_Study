@@ -9,6 +9,8 @@ import React from "react";
 import FruitModal from "../modals/fruitModals";
 import ItemComponent from "../components/ItemComponent";
 import styled from "styled-components";
+import TooltiComponent from "../Tooltip/tooltipComponent";
+import { InfoCircledIcon } from "@radix-ui/react-icons";
 
 export const MainPage: React.FC = () => {
   const fruits = useSelector((state: RootState) => state.fruit);
@@ -34,22 +36,34 @@ export const MainPage: React.FC = () => {
 
   return (
     <>
-      <ItemListSection>
-        <ItemListWarp>
-          {fruits.map((perFruit) => (
-            <ItemWarp key={perFruit.id}>
-              <ItemComponent
-                fruitInfo={perFruit}
-                setDialogStatus={setDialogStatus}
-                setShowModal={setShowModal}
-                setFruitInfo={setFruitInfo}
-              ></ItemComponent>
-            </ItemWarp>
-          ))}
-        </ItemListWarp>
-      </ItemListSection>
+      {fruits && fruits.length > 0 && (
+        <ItemListSection>
+          <ItemListWarp>
+            {fruits.map((perFruit) => (
+              <ItemWarp key={perFruit.id}>
+                <ItemComponent
+                  fruitInfo={perFruit}
+                  setDialogStatus={setDialogStatus}
+                  setShowModal={setShowModal}
+                  setFruitInfo={setFruitInfo}
+                ></ItemComponent>
+              </ItemWarp>
+            ))}
+          </ItemListWarp>
+        </ItemListSection>
+      )}
+      <BaseWarp>
+        <button onClick={() => setShowModal(true)}>Add Fruit</button>
+        <TooltiComponent
+          children={
+            <InfoButton>
+              <InfoCircledIcon></InfoCircledIcon>
+            </InfoButton>
+          }
+          text="Add New Fruit For Sale"
+        ></TooltiComponent>
+      </BaseWarp>
 
-      <button onClick={() => setShowModal(true)}>Add Fruit</button>
       {showModal && (
         <FruitModal
           status={dialogStatus}
@@ -93,4 +107,25 @@ const ItemWarp = styled.div`
   min-height: 450px;
   max-width: 400px;
   max-height: 450px;
+`;
+
+const BaseWarp = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  gap: 8px;
+
+  > button {
+    border-radius: 4px;
+  }
+`;
+
+const InfoButton = styled.button`
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  &:hover {
+    cursor: pointer;
+  }
 `;
