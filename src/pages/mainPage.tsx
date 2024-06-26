@@ -1,15 +1,16 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "../reduxComponent/store";
 
 import { useState } from "react";
 
 //actions
-import { DELETE_FRUIT, fruitProp } from "../reduxComponent/slice";
+import { fruitProp } from "../reduxComponent/slice";
 import React from "react";
 import FruitModal from "../modals/fruitModals";
+import ItemComponent from "../components/ItemComponent";
+import styled from "styled-components";
 
 export const MainPage: React.FC = () => {
-  const dipatch = useDispatch();
   const fruits = useSelector((state: RootState) => state.fruit);
 
   const [fruitInfo, setFruitInfo] = useState<fruitProp>({
@@ -33,40 +34,20 @@ export const MainPage: React.FC = () => {
 
   return (
     <>
-      {fruits.map((perFruit) => (
-        <React.Fragment key={perFruit.id}>
-          <div>
-            <div>fruit name: {perFruit.name}</div>
-            <div>fruit brand: {perFruit.brand}</div>
-            <div>fruit price: {perFruit.price}</div>
-            <div>number of fruit available: {perFruit.numberAvailable}</div>
-            <button
-              onClick={() => {
-                dipatch(DELETE_FRUIT({ id: perFruit.id }));
-              }}
-            >
-              Delete Fruit
-            </button>
-            <button
-              onClick={() => {
-                setFruitInfo({
-                  id: perFruit.id,
-                  name: perFruit.name,
-                  brand: perFruit.brand,
-                  price: Number(perFruit.price),
-                  numberAvailable: Number(perFruit.numberAvailable),
-                  numberSold: Number(perFruit.numberSold),
-                });
-                setDialogStatus("Modify");
-                setShowModal(true);
-              }}
-            >
-              Modify Fruit
-            </button>
-          </div>
-          <br />
-        </React.Fragment>
-      ))}
+      <ItemListSection>
+        <ItemListWarp>
+          {fruits.map((perFruit) => (
+            <ItemWarp key={perFruit.id}>
+              <ItemComponent
+                fruitInfo={perFruit}
+                setDialogStatus={setDialogStatus}
+                setShowModal={setShowModal}
+                setFruitInfo={setFruitInfo}
+              ></ItemComponent>
+            </ItemWarp>
+          ))}
+        </ItemListWarp>
+      </ItemListSection>
 
       <button onClick={() => setShowModal(true)}>Add Fruit</button>
       {showModal && (
@@ -83,3 +64,33 @@ export const MainPage: React.FC = () => {
     </>
   );
 };
+
+const ItemListSection = styled.div`
+  width: 100%;
+  height: auto;
+  background-color: lightgreen;
+`;
+const ItemListWarp = styled.div`
+  width: 1500px;
+  margin: auto;
+  height: auto;
+  padding: 16px 24px;
+  box-sizing: border-box;
+  gap: 10px;
+  display: flex;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+`;
+
+const ItemWarp = styled.div`
+  min-width: 400px;
+  min-height: 450px;
+  max-width: 400px;
+  max-height: 450px;
+`;
